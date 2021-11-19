@@ -12,4 +12,5 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
     run(argc, argv);
+    read_file(open_file());
 }

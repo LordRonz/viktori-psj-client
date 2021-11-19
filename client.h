@@ -14,6 +14,7 @@
 #include <signal.h>
 #include <pthread.h>
 #include <stdint.h>
+#include "serial_io.h"
 
 #define RCVBUFSIZE 128   /* Size of receive buffer */
 
