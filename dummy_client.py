@@ -13,7 +13,7 @@ def client_thread(name):
         s.connect((HOST, PORT))
         while True:
             payload = f'{choice((0, 1))} {choice(range(1, 101))} {choice(range(1, 101))}\n'
-            s.send(bytes(payload, 'utf-8'))
+            s.sendall(bytes(payload, 'utf-8'))
             data = s.recv(1024)
             if not data:
                 return
