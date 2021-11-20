@@ -17,6 +17,7 @@
 #include "serial_io.h"
 
 #define RCVBUFSIZE 128   /* Size of receive buffer */
+#define SENDBUFSIZE 128
 
 void run(int, char**);
 void die_with_error(char *);  /* Error handling function */

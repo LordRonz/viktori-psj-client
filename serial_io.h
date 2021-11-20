@@ -8,7 +8,7 @@
 #include <errno.h>   /* Error number definitions */
 #include <termios.h> /* POSIX terminal control definitions */
 
-int open_file();
-int read_file(int);
+int open_serial();
+int read_serial(int, char *, int);
 
 #endif

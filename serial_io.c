@@ -1,6 +1,6 @@
 #include "serial_io.h"
 
-int open_file() {
+int open_serial() {
     int fd = open("/dev/ttyACM0", O_RDONLY);
     if (fd == -1) {
         perror("open_port: Unable to open /dev/ttyACM0 - ");
@@ -8,18 +8,18 @@ int open_file() {
     return fd;
 }
 
-int read_file(int fd) {
+int read_serial(int fd, char *s, int max_len) {
     unsigned char ichar;
-    char s[100];
     int i = 0, ifd;
-    for (;;) {
+    for (;i < max_len;) {
         ifd = read(fd, &ichar, 1);
+        printf("This : %d\n", ichar);
         s[i++] = ichar;
         if (ichar == '\n') {
-            s[i] = '\0';
             printf("%s", s);
-            i = 0;
+            break;
         }
     }
-    close(fd);
+    s[i] = '\0';
+    return i;
 }
