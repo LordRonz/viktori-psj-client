@@ -8,12 +8,12 @@ int open_serial() {
     return fd;
 }
 
-int read_serial(int fd, char *s, int max_len) {
+unsigned int read_serial(int fd, char *s, int max_len) {
     unsigned char ichar;
-    int i = 0, ifd;
+    unsigned int i = 0;
+    int ifd;
     for (;i < max_len;) {
         ifd = read(fd, &ichar, 1);
-        printf("This : %d\n", ichar);
         s[i++] = ichar;
         if (ichar == '\n') {
             printf("%s", s);

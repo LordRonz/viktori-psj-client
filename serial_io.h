@@ -9,6 +9,6 @@
 #include <termios.h> /* POSIX terminal control definitions */
 
 int open_serial();
-int read_serial(int, char *, int);
+unsigned int read_serial(int, char *, int);
 
 #endif
