@@ -16,9 +16,9 @@ def client_thread(name):
             s.sendall(bytes(payload, 'utf-8'))
             data = s.recv(1024)
             if not data:
-                return
+                break
             logging.info('Thread %s, Received %s', name, repr(data))
-            time.sleep(3)
+            time.sleep(choice(range(1, 7)))
 
 def main():
     fmt = '%(asctime)s: %(message)s'
