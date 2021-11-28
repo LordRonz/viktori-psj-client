@@ -36,6 +36,9 @@ void run(int argc, char **argv) {
     echo_string = malloc(sizeof (char) * SENDBUFSIZE);
     serial_fd = open_serial();
 
+    if (serial_fd == -1) {
+        die_with_error("open_serial() failed");
+    }
 
     /* Establish the connection to the echo server */
     if (connect(sock, res->ai_addr, res->ai_addrlen) < 0) {
@@ -43,6 +46,7 @@ void run(int argc, char **argv) {
     }
 
     for(;;) {
+        memset(echo_string, 0, sizeof (char) * SENDBUFSIZE);
         echo_string_len = read_serial(serial_fd, echo_string, SENDBUFSIZE);
 
         echo_string_len = strlen(echo_string);     /* Determine input length */
