@@ -10,15 +10,15 @@ void run(int argc, char **argv) {
                                         and total bytes read */
     struct addrinfo hints, *res;
     int serial_fd;
-
-    echo_string = argv[2];         /* Second arg: string to echo */
+    int mode = NORMAL_MODE;
+    char *n_tail;
 
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_INET;  // use IPv4 or IPv6, whichever
     hints.ai_socktype = SOCK_STREAM;
 
     {
-        char *server_port = argc == 4 ? argv[3] : "7";  /* Third arg:  local port */
+        char *server_port = argc > 2 ? argv[2] : "7";  /* Third arg:  local port */
         char *server_ip = argv[1];      /* First arg: server IP address (dotted quad) */
         int status = getaddrinfo(server_ip, server_port, &hints, &res);
         if (status != 0) {
@@ -33,11 +33,17 @@ void run(int argc, char **argv) {
         die_with_error("socket() failed");
     }
 
-    echo_string = malloc(sizeof (char) * SENDBUFSIZE);
-    serial_fd = open_serial();
+    mode = argc > 3 ? strcmp(argv[3], "tail") == 0 ? TAIL_MODE : NORMAL_MODE : NORMAL_MODE;
 
-    if (serial_fd == -1) {
-        die_with_error("open_serial() failed");
+    n_tail = argc == 5 ? argv[4] : "";
+
+    echo_string = malloc(sizeof (char) * SENDBUFSIZE);
+    if (mode == NORMAL_MODE) {
+        serial_fd = open_serial();
+
+        if (serial_fd == -1) {
+            die_with_error("open_serial() failed");
+        }
     }
 
     /* Establish the connection to the echo server */
@@ -47,7 +53,15 @@ void run(int argc, char **argv) {
 
     for(;;) {
         memset(echo_string, 0, sizeof (char) * SENDBUFSIZE);
-        echo_string_len = read_serial(serial_fd, echo_string, SENDBUFSIZE);
+        if (mode == TAIL_MODE) {
+            strcpy(echo_string, "");
+            strcat(echo_string, "tail ");
+            strcat(echo_string, n_tail);
+            strcat(echo_string, "\n");
+        }
+        else {
+            echo_string_len = read_serial(serial_fd, echo_string, SENDBUFSIZE);
+        }
 
         echo_string_len = strlen(echo_string);     /* Determine input length */
 
@@ -71,6 +85,10 @@ void run(int argc, char **argv) {
         printf("%s", echo_buffer);      /* Print the echo buffer */
 
         puts("");    /* Print a final linefeed */
+
+        if (mode == TAIL_MODE) {
+            break;
+        }
     }
 
     free(echo_string);
