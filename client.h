@@ -18,6 +18,8 @@
 
 #define RCVBUFSIZE 128   /* Size of receive buffer */
 #define SENDBUFSIZE 128
+#define NORMAL_MODE 0
+#define TAIL_MODE 1
 
 void run(int, char**);
 void die_with_error(char *);  /* Error handling function */

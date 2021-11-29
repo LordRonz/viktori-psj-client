@@ -25,7 +25,7 @@ def client_thread(args: dict[str, Any]):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((ADDR, PORT))
         while True:
-            payload = f'{choice((0, 1))} {choice(range(1, 101))} {choice(range(1, 101))}\n'
+            payload = f'{choice(range(1, 101))} {choice(range(1, 101))} {choice(range(1, 101))}\n'
             s.sendall(bytes(payload, 'utf-8'))
             data = s.recv(1024)
             if not data:
