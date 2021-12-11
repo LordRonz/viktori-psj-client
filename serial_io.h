@@ -8,6 +8,7 @@
 #include <errno.h>   /* Error number definitions */
 #include <termios.h> /* POSIX terminal control definitions */
 
+int setup_serial_port();
 int open_serial();
 unsigned int read_serial(int, char *, int);
 

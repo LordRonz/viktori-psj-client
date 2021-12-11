@@ -14,6 +14,7 @@
 #include <signal.h>
 #include <pthread.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include "serial_io.h"
 
 #define RCVBUFSIZE 128   /* Size of receive buffer */
@@ -21,7 +22,10 @@
 #define NORMAL_MODE 0
 #define TAIL_MODE 1
 
+extern volatile bool exit_requested;
+
 void run(int, char**);
 void die_with_error(char *);  /* Error handling function */
+void catcher(int);
 
 #endif

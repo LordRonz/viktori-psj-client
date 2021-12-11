@@ -1,5 +1,7 @@
 #include "client.h"
 
+volatile bool exit_requested = false;
+
 void run(int argc, char **argv) {
     int sock;                        /* Socket descriptor */
     struct sockaddr_in server_addr; /* Echo server address */
@@ -39,7 +41,7 @@ void run(int argc, char **argv) {
 
     echo_string = malloc(sizeof (char) * SENDBUFSIZE);
     if (mode == NORMAL_MODE) {
-        serial_fd = open_serial();
+        serial_fd = setup_serial_port();
 
         if (serial_fd == -1) {
             die_with_error("open_serial() failed");
@@ -51,7 +53,18 @@ void run(int argc, char **argv) {
         die_with_error("connect() failed");
     }
 
-    for(;;) {
+    struct sigaction sact;
+    time_t t;
+
+    for(;!exit_requested;) {
+        // Setup exit handler signal
+        sigemptyset(&sact.sa_mask);
+        sact.sa_flags = 0;
+        sact.sa_handler = catcher;
+        sigaction(SIGALRM, &sact, NULL);
+        alarm(5);
+        time(&t);
+
         memset(echo_string, 0, sizeof (char) * SENDBUFSIZE);
         if (mode == TAIL_MODE) {
             strcpy(echo_string, "");
@@ -78,6 +91,9 @@ void run(int argc, char **argv) {
             a null terminator) bytes from the sender */
         bytes_rcvd = recv(sock, echo_buffer, RCVBUFSIZE - 1, 0);
         if (bytes_rcvd < 1) {
+            if (errno == EINTR) {
+                continue;
+            }
             die_with_error("recv() failed or connection closed prematurely");
         }
         total_bytes_rcvd += bytes_rcvd;   /* Keep tally of total bytes */
@@ -94,6 +110,10 @@ void run(int argc, char **argv) {
     free(echo_string);
     close(serial_fd);
     close(sock);
+}
+
+void catcher(int sig) {
+
 }
 
 void die_with_error(char *error_message) {

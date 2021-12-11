@@ -1,8 +1,8 @@
 #include "client.h"
 
 void sigint_handler(int sig) {
-    puts("Terminated");
-    exit(EXIT_SUCCESS);
+    puts("SIGINT Received\nTerminating...");
+    exit_requested = true;
 }
 
 int main(int argc, char **argv) {
