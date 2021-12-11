@@ -8,12 +8,12 @@ void run(int argc, char **argv) {
     char *echo_string;                /* String to send to echo server */
     char echo_buffer[RCVBUFSIZE];     /* Buffer for echo string */
     unsigned int echo_string_len;      /* Length of string to echo */
-    int bytes_rcvd, total_bytes_rcvd;   /* Bytes read in single recv()
+    int bytes_rcvd;   /* Bytes read in single recv()
                                         and total bytes read */
     struct addrinfo hints, *res;
     int serial_fd;
     int mode = NORMAL_MODE;
-    char *n_tail;
+    char *n_tail = NULL;
 
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_INET;  // use IPv4 or IPv6, whichever
@@ -53,6 +53,8 @@ void run(int argc, char **argv) {
         die_with_error("connect() failed");
     }
 
+    freeaddrinfo(res);
+
     struct sigaction sact;
     time_t t;
 
@@ -71,8 +73,7 @@ void run(int argc, char **argv) {
             strcat(echo_string, "tail ");
             strcat(echo_string, n_tail);
             strcat(echo_string, "\n");
-        }
-        else {
+        } else {
             echo_string_len = read_serial(serial_fd, echo_string, SENDBUFSIZE);
         }
 
@@ -81,10 +82,12 @@ void run(int argc, char **argv) {
         /* Send the string to the server */
         if (send(sock, echo_string, echo_string_len, 0) != echo_string_len) {
             die_with_error("send() sent a different number of bytes than expected");
+        } else {
+            printf("Sent: %s", echo_string);
         }
 
-        /* Receive the same string back from the server */
-        total_bytes_rcvd = 0;
+        memset(echo_buffer, 0, sizeof (char) * RCVBUFSIZE);
+
         printf("Received: ");                /* Setup to print the echoed string */
 
         /* Receive up to the buffer size (minus 1 to leave space for
@@ -96,7 +99,7 @@ void run(int argc, char **argv) {
             }
             die_with_error("recv() failed or connection closed prematurely");
         }
-        total_bytes_rcvd += bytes_rcvd;   /* Keep tally of total bytes */
+
         echo_buffer[bytes_rcvd] = '\0';  /* Terminate the string! */
         printf("%s", echo_buffer);      /* Print the echo buffer */
 
@@ -108,7 +111,9 @@ void run(int argc, char **argv) {
     }
 
     free(echo_string);
-    close(serial_fd);
+    if (mode == NORMAL_MODE) {
+        close(serial_fd);
+    }
     close(sock);
 }
 
