@@ -11,7 +11,7 @@ void run(int argc, char **argv) {
     int bytes_rcvd;   /* Bytes read in single recv()
                                         and total bytes read */
     struct addrinfo hints, *res;
-    int serial_fd;
+    int serial_fd = 0;
     int mode = NORMAL_MODE;
     char *n_tail = NULL;
 
@@ -75,6 +75,10 @@ void run(int argc, char **argv) {
             strcat(echo_string, "\n");
         } else {
             echo_string_len = read_serial(serial_fd, echo_string, SENDBUFSIZE);
+            if (echo_string_len == -1) {
+                perror("read_serial() failed");
+                continue;
+            }
         }
 
         echo_string_len = strlen(echo_string);     /* Determine input length */

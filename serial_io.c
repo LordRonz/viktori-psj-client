@@ -52,18 +52,27 @@ int open_serial() {
     return fd;
 }
 
-unsigned int read_serial(int fd, char *s, int max_len) {
-    unsigned char ichar;
+int read_serial(int fd, char *s, int max_len) {
+    unsigned char ichar = 0;
     unsigned int i = 0;
     int ifd;
+
     for (;i < max_len;) {
         ifd = read(fd, &ichar, 1);
-        s[i++] = ichar;
-        if (ichar == '\n') {
+        if (ifd == -1) {
+            return -1;
+        }
+        if (ichar == '{') {
+            i = 0;
+            continue;
+        }
+        if (ichar == '}') {
             break;
         }
+        s[i++] = ichar;
     }
-    s[i] = '\0';
 
+    s[i++] = '\n';
+    s[i] = '\0';
     return i;
 }
