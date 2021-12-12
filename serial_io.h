@@ -10,6 +10,6 @@
 
 int setup_serial_port();
 int open_serial();
-unsigned int read_serial(int, char *, int);
+int read_serial(int, char *, int);
 
 #endif
