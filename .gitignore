@@ -56,3 +56,4 @@ build
 
 # gdb
 .gdb_history
+.mypy_cache
